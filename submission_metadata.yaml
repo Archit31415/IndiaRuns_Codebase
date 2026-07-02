@@ -7,35 +7,36 @@
 # ============================================================================
 # Team identity
 # ============================================================================
-team_name: "your-team-name-here"  # Used in leaderboard and announcements
+team_name: "Compilation_Error"  # Used in leaderboard and announcements
 
 primary_contact:
-  name: "Full Name"
-  email: "primary@example.com"   # Used for all organizer communication
-  phone: "+91-XXXXXXXXXX"        # Used for top-50 / top-10 outreach
+  name: "Ansh Bansal"
+  email: "anshbansal7433@gmail.com"   # Used for all organizer communication
+  phone: "+91-7011565639"        # Used for top-50 / top-10 outreach
 
 team_members:
-  - name: "Member 1 Full Name"
-    email: "member1@example.com"
-    role: "ML Engineer"          # Optional, e.g. "Team Lead", "Backend", "Data"
-  - name: "Member 2 Full Name"
-    email: "member2@example.com"
-    role: "Data Engineer"
+  - name: "Ansh Bansal"
+    email: "anshbansal7433@gmail.com"
+    role: "Team Lead"
+  - name: "Archit Singal"
+    email: "archit.singal@iitg.ac.in"
+  - name: "Anuj Sharma"
+    email: "anuj.p.sharma07@gmail.com"
   # Add more members as needed; solo participants list just one member
 
 # ============================================================================
 # Code and reproducibility
 # ============================================================================
-github_repo: "https://github.com/YOUR_USERNAME/YOUR_REPO"
+github_repo: "https://github.com/Archit31415/IndiaRuns_Codebase"
 # Required. Must be reachable. Private repos OK if you can grant organizer
 # access at Stage 3 (the email to add will be communicated then).
 
-sandbox_link: "https://huggingface.co/spaces/YOUR_USERNAME/redrob-ranker"
+sandbox_link: "https://archit31415-indiaruns-codebase-app-aeucwf.streamlit.app/"
 # Required. A working hosted environment where the ranker can be run on a small
 # candidate sample. See Section 10.5 of submission_spec.md for acceptable
 # platforms (HuggingFace Spaces, Streamlit Cloud, Replit, Colab, Docker, Binder).
 
-reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
+reproduce_command: "./run_ranker.sh"
 # The single command that produces submission.csv from candidates.jsonl.
 # Should run end-to-end within 5 minutes on CPU with 16GB RAM and no network.
 
@@ -43,15 +44,15 @@ reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submi
 # Compute environment
 # ============================================================================
 compute:
-  platform: "MacBook Pro M2"                    # Or: "AWS EC2 c5.4xlarge", "Local Linux box", etc.
-  cpu_cores: 8                                  # Number of CPU cores used
+  platform: "MacBook Air M4"                    # Or: "AWS EC2 c5.4xlarge", "Local Linux box", etc.
+  cpu_cores: 10                                  # Number of CPU cores used
   ram_gb: 16                                    # Available RAM in GB
-  python_version: "3.11.4"                      # python --version
-  os: "macOS 14.2"                              # Or "Ubuntu 22.04 LTS", etc.
+  python_version: "3.14.5"                      # python --version
+  os: "macOS 26.5.1"                              # Or "Ubuntu 22.04 LTS", etc.
   uses_gpu_for_inference: false                 # Must be false — see compute constraints
   has_network_during_ranking: false             # Must be false — no API calls during ranking
   pre_computation_required: false               # true if you pre-compute embeddings or train models offline
-  pre_computation_time_minutes: 0               # Approximate, if applicable
+  pre_computation_time_minutes: 4-5               # Approximate, if applicable
 
 # ============================================================================
 # AI tools declaration
@@ -60,16 +61,13 @@ compute:
 # may verify these declarations against your code; declarations that contradict
 # your code or your interview are flagged.
 ai_tools_used:
-  - "Claude"        # e.g. for architecture discussion, code review
-  - "GitHub Copilot"  # e.g. for autocomplete
+  - "Gemini"  # e.g. for autocomplete
   # Other options: "ChatGPT", "Cursor", "Gemini", "Codeium", "Other", "None"
 
 ai_usage_summary: |
   Briefly describe how AI tools were used. Examples:
-  - "Used Claude for code review and architectural discussion. Used Copilot for autocomplete.
+  - "Used Gemini for code review and architectural discussion.
      No candidate data was fed to any LLM."
-  - "Used ChatGPT to debug Python issues and Cursor for refactoring."
-  - "No AI tools used."
 
 # ============================================================================
 # Approach summary (optional but recommended)
@@ -77,13 +75,18 @@ ai_usage_summary: |
 methodology_summary: |
   ≤200 word summary of your approach. Strongly recommended.
 
-  Example:
-  "Rule-based ranker with explicit reasoning capture. Five scoring components
-  (skills, title+career, experience years, location, education) combined with
-  a multiplicative behavioral-signal modifier. The title component is the
-  decisive signal against keyword-stuffer traps; an endorsement-and-duration
-  trust multiplier on skills catches lazy keyword stuffing. Runtime is ~10
-  seconds for 50K candidates on CPU."
+  "To process 100,000 candidates under a strict 15-second CPU constraint, our system decouples heavy 
+  calculations into an Offline Preparation Layer and an Online Ranker Engine. During the offline phase, 
+  raw text profiles are converted into chronological work histories, a local transformer model vectorizes 
+  these profiles into a 150MB dense semantic matrix, and baseline behavioral signals are saved as localized 
+  JSON parameters. When the online pipeline runs, Stage 0 instantly purges invalid records and 
+  keyword-stuffed honeypots, while a C-optimized spaCy extraction pass flags structural text matches to 
+  truncate the pool. Next, the engine executes rapid matrix dot products over the precomputed embedding 
+  array to isolate deep semantic alignment without memory bloat, before normalising multi-axis scores and 
+  applying deterministic tie-breakers (like career longevity and profile stability coefficients) to output 
+  the elite, top-100 ranked spreadsheet instantly. By physically separating feature generation from 
+  execution-stage scoring loops, the system completely eliminates runtime network dependencies and 
+  cold-start container latencies, running safely inside isolated offline environments."
 
 # ============================================================================
 # Declarations
@@ -92,5 +95,5 @@ declarations:
   read_submission_spec: true        # I have read submission_spec.md in full
   code_is_original_work: true       # My code is my team's original work (using AI as a tool is fine)
   no_collusion: true                # I have not coordinated my submission with other teams
-  honeypot_check_done: false        # OPTIONAL — set true if you explicitly checked for honeypots in your ranking
+  honeypot_check_done: true        # OPTIONAL — set true if you explicitly checked for honeypots in your ranking
   reproduction_tested: true         # I have tested that my reproduce_command runs end-to-end

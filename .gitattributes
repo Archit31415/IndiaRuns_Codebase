@@ -1,3 +1,0 @@
-data/output filter=lfs diff=lfs merge=lfs -text
-data/precomputed filter=lfs diff=lfs merge=lfs -text
-data/raw filter=lfs diff=lfs merge=lfs -text
