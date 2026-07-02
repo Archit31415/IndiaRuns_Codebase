@@ -93,30 +93,3 @@ def ndcg_at_k(actual_relevance: list, k: int) -> float:
         return 0.0
         
     return dcg_val / idcg_val
-
-if __name__ == "__main__":
-    print("--- Testing IR Metrics ---")
-    
-    # Mock Scenario: 
-    # Let's say we have 10 candidates. Our algorithm ranked them.
-    # Here are their TRUE manual grades (3 = Perfect, 2 = Good, 1 = Okay, 0 = Bad/Honeypot)
-    # in the order that our pipeline outputted them.
-    
-    mock_ranking_relevance = [3, 2, 3, 0, 1, 2, 0, 0, 1, 0]
-    
-    binary_relevance = [1 if score >= 2 else 0 for score in mock_ranking_relevance]
-
-    p_at_3 = precision_at_k(binary_relevance, k=3)
-    p_at_10 = precision_at_k(binary_relevance, k=10)
-    map_score = mean_average_precision([binary_relevance])
-    ndcg_10 = ndcg_at_k(mock_ranking_relevance, k=10)
-    ndcg_50 = ndcg_at_k(mock_ranking_relevance, k=50) # Works seamlessly even if list is smaller than K
-
-    print(f"Predicted Ranking Relevance (Graded): {mock_ranking_relevance}")
-    print(f"Predicted Ranking Relevance (Binary): {binary_relevance}")
-    print("-" * 30)
-    print(f"Precision@3:  {p_at_3:.4f}")
-    print(f"Precision@10: {p_at_10:.4f}")
-    print(f"MAP:          {map_score:.4f}")
-    print(f"NDCG@10:      {ndcg_10:.4f}")
-    print(f"NDCG@50:      {ndcg_50:.4f}")

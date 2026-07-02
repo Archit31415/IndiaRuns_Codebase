@@ -47,28 +47,20 @@ def run_purge(candidates_file_path: Path, rubric_path: Path) -> set:
             claimed_years_exp = profile.get("years_of_experience", 0.0)
             is_honeypot = False
 
-            # -----------------------------------------------------------------
-            # HARDENED TRAP A: The Skill-Duration Paradox 
-            # -----------------------------------------------------------------
             for skill in skills:
                 proficiency = str(skill.get("proficiency", "")).lower().strip()
                 duration = skill.get("duration_months", 0)
                 
-                # Catch ANY advanced/expert claim mapped to zero real usage time
                 if proficiency in ["advanced", "expert"] and duration <= 0:
                     is_honeypot = True
                     break
 
-            # -----------------------------------------------------------------
-            # HARDENED TRAP B: Absolute Calendar Timeline Discrepancy
-            # -----------------------------------------------------------------
             total_claimed_months = 0
             earliest_start = None
             latest_end = None
             
             for job in career:
                 start_dt = parse_date(job.get("start_date"))
-                # If current role, boundary extends to today's execution marker
                 end_dt = parse_date(job.get("end_date")) if not job.get("is_current") else datetime.now()
                 
                 job_duration_months = job.get("duration_months", 0)
@@ -81,22 +73,17 @@ def run_purge(candidates_file_path: Path, rubric_path: Path) -> set:
                         if latest_end is None or end_dt > latest_end:
                             latest_end = end_dt
                             
-                # Internal Paradox: Individual job claimed duration cannot exceed real calendar duration
                 if start_dt and end_dt and job_duration_months > 0:
                     real_job_delta_months = ((end_dt - start_dt).days / 30.44) + 1.5
                     if job_duration_months > real_job_delta_months * 1.5:
                         is_honeypot = True
 
             if earliest_start and latest_end:
-                # Absolute max timeframe spanning their entire documented career
                 max_possible_calendar_months = ((latest_end - earliest_start).days / 30.44) + 1.0
                 
-                # If the sum of individual blocks drastically outpaces the calendar timeline,
-                # it exposes impossible experience stacking.
                 if total_claimed_months > (max_possible_calendar_months * 1.3):
                     is_honeypot = True
                     
-                # If the profile's claimed YOE is larger than the entire elapsed calendar timeline
                 if (claimed_years_exp * 12.0) > (max_possible_calendar_months * 1.1):
                     is_honeypot = True
 
@@ -104,9 +91,6 @@ def run_purge(candidates_file_path: Path, rubric_path: Path) -> set:
                 honeypots_caught += 1
                 continue
 
-            # -----------------------------------------------------------------
-            # STANDARD RUBRIC FILTERS
-            # -----------------------------------------------------------------
             if claimed_years_exp < min_exp:
                 filter_drops += 1
                 continue

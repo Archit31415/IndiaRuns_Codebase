@@ -45,7 +45,6 @@ def run_ner_heuristics(valid_candidate_ids: set, top_k: int = 1500) -> dict:
     print("   - Loading local spaCy EntityRuler...")
     nlp = spacy.load(spacy_model_path)
 
-    # We only process candidates that survived the Stage 0 Purge
     processing_batch = []
     for cid in valid_candidate_ids:
         text = histories.get(cid, {}).get("history_text", "")
@@ -56,7 +55,6 @@ def run_ner_heuristics(valid_candidate_ids: set, top_k: int = 1500) -> dict:
     extracted_entities_map = {}
 
     print("   - Executing bulk entity extraction...")
-    # nlp.pipe is heavily optimized in C and bypasses Python loop overhead
     for doc, cid in nlp.pipe(processing_batch, as_tuples=True, batch_size=512):
         score = 0.0
         found_ents = set()
@@ -69,19 +67,14 @@ def run_ner_heuristics(valid_candidate_ids: set, top_k: int = 1500) -> dict:
                 found_ents.add(text_val)
                 score += target_weights.get(label, 1.0)
                 
-        # Store what we found so Stage 4 can use it to write the reasoning sentences
         extracted_entities_map[cid] = list(found_ents)
         
-        # Scale the pure NER score by their static experience modifier 
-        # (This penalizes job hoppers and boosts product-company engineers immediately)
         exp_modifier = static_scores.get(cid, {}).get("experience_modifier", 1.0)
         final_heuristic_score = score * exp_modifier
         
         candidate_scores.append((final_heuristic_score, cid))
 
-    # 5. Sort and truncate to the top 1,500
     print("   - Sorting and shortlisting top candidates...")
-    # Sort descending by score
     candidate_scores.sort(key=lambda x: (-x[0], x[1]))
     
     top_candidates = {}
@@ -91,12 +84,5 @@ def run_ner_heuristics(valid_candidate_ids: set, top_k: int = 1500) -> dict:
             "entities_found": extracted_entities_map[cid]
         }
 
-    print(f"✅ [Stage 1] Shortlist complete. Filtered down to top {len(top_candidates)} candidates.")
+    print(f"[Stage 1] Shortlist complete. Filtered down to top {len(top_candidates)} candidates.")
     return top_candidates
-
-if __name__ == "__main__":
-    # Local manual testing execution
-    # Assuming valid_ids comes from stage0
-    dummy_valid_ids = {"CAND_0000031", "CAND_0000001"} # Ela Singh vs Ira Vora test
-    results = run_ner_heuristics(dummy_valid_ids, top_k=2)
-    print(json.dumps(results, indent=2))

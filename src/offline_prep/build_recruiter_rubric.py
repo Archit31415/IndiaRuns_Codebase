@@ -165,13 +165,13 @@ def build_rubric():
   },
 
   "stage4_final_ranking_weights": {
-    "experience_score": 0.25,
+    "experience_score": 0.20,          
     "product_company_score": 0.20,
     "retrieval_ranking_score": 0.25,
     "production_system_score": 0.15,
-    "behavioral_score": 0.10,
+    "behavioral_score": 0.15,          
     "external_validation_score": 0.05
-  }
+}
 }
 
     with open(output_path, "w", encoding="utf-8") as f:

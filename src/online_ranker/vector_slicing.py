@@ -69,11 +69,3 @@ def run_vector_scoring(top_candidates: dict) -> dict:
 
     print(f"[Stage 2] Semantic scoring complete for {len(top_candidates)} candidates.")
     return top_candidates
-
-if __name__ == "__main__":
-    dummy_input = {
-        "CAND_0000031": {"heuristic_score": 5.0, "entities_found": ["pinecone", "xgboost"]},
-        "CAND_0000001": {"heuristic_score": 1.0, "entities_found": []}
-    }
-    results = run_vector_scoring(dummy_input)
-    print(results)

@@ -21,7 +21,7 @@ def extract_verified_jd_skills(entities_found: list) -> list:
     }
     
     verified_matches = [ent.title() for ent in entities_found if ent.lower() in core_targets]
-    return list(set(verified_matches))[:3]  # Keep it concise (top 3)
+    return list(set(verified_matches))[:3]  
 
 def generate_honest_concern(candidate_id: str, static_scores_map: dict) -> str:
     """
@@ -34,11 +34,9 @@ def generate_honest_concern(candidate_id: str, static_scores_map: dict) -> str:
     
     concerns = []
     
-    # Identify if candidate was flagged as a job hopper in Stage 2 offline setup
     if exp_mod < 1.0:
         concerns.append("Noted history of shorter tenures (potential job-hopper risk).")
         
-    # Low response rate threshold
     if behavioral < 0.50:
         concerns.append("Lower platform responsiveness metric requires active engagement monitoring.")
         
@@ -67,16 +65,14 @@ def generate_reasoning_and_export(final_top_100: list, team_name: str):
         yoe = item["years_exp"]
         entities = item.get("entities_found", [])
         
-        # Extract numerical digits from "CAND_0042871" -> 42871 to act as a permanent seed
         try:
             cand_seed = int("".join(filter(str.isdigit, cid)))
         except ValueError:
-            cand_seed = len(cid) # Fallback seed
+            cand_seed = len(cid) 
             
         verified_tools = extract_verified_jd_skills(entities)
-        tools_str = ", ".join(verified_tools) if verified_tools else "applied ML architectures"
+        tools_str = ", ".join(verified_tools) if verified_tools else "advanced ML"
         
-        # --- Deterministic Concern Selector ---
         static_data = static_scores_map.get(cid, {})
         exp_mod = static_data.get("experience_modifier", 1.0)
         behavioral = static_data.get("behavioral_score", 1.0)
@@ -89,11 +85,9 @@ def generate_reasoning_and_export(final_top_100: list, team_name: str):
             
         concern_str = ""
         if concerns_pool:
-            # Deterministic selection using modulo arithmetic instead of random choice
             concern_idx = cand_seed % len(concerns_pool)
             concern_str = concerns_pool[concern_idx]
 
-        # --- Deterministic Text Template Array Selection ---
         if rank <= 20:
             bases = [
                 f"Exceptional product-focused fit with {yoe} YOE, showcasing strong production deployment validation with {tools_str}.",
@@ -131,7 +125,6 @@ def generate_reasoning_and_export(final_top_100: list, team_name: str):
             "reasoning": reasoning.strip()
         })
 
-    # Writing canonical CSV schema (candidate_id, rank, score, reasoning)
     with open(output_csv_path, mode="w", newline="", encoding="utf-8") as csv_f:
         fieldnames = ["candidate_id", "rank", "score", "reasoning"]
         writer = csv.DictWriter(csv_f, fieldnames=fieldnames)
@@ -139,4 +132,4 @@ def generate_reasoning_and_export(final_top_100: list, team_name: str):
         for row in submission_rows:
             writer.writerow(row)
 
-    print(f"✅ Safe, frozen submission artifact generated at: {output_csv_path}")
+    print(f"Safe, frozen submission artifact generated at: {output_csv_path}")

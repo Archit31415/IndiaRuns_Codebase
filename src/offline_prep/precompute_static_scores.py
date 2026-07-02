@@ -32,10 +32,13 @@ def precompute_static_scores():
             signals = cand.get("redrob_signals", {})
             
             gh_raw = signals.get("github_activity_score", 0)
-            gh_score = max(0, gh_raw) / 100.0  
+            if gh_raw <= 0:
+                gh_score = 0.2 
+            else:
+                gh_score = max(0.4, min(1.0, gh_raw / 50.0))  
             
-            response_rate = signals.get("recruiter_response_rate", 0)
-            open_to_work = 1.0 if signals.get("open_to_work_flag") else 0.0
+            response_rate = max(0.4, signals.get("recruiter_response_rate", 0)) 
+            open_to_work = 1.0 if signals.get("open_to_work_flag") else 0.3     
             
             behavioral_score = (
                 (response_rate * b_weights["recruiter_response_rate"]) +
@@ -45,18 +48,26 @@ def precompute_static_scores():
 
             notice_days = signals.get("notice_period_days", 30)
             if notice_days > rubric["stage3_behavioral_signals"]["max_acceptable_notice_period"]:
-                behavioral_score *= 0.5  
+                behavioral_score *= 0.85  
 
             years_exp = cand.get("profile", {}).get("years_of_experience", 0)
             company_count = len(cand.get("career_history", []))
             
             exp_modifier = 1.0
             if company_count > 0 and (years_exp / company_count) < exp_scoring["job_hopper_threshold_years"]:
-                exp_modifier *= exp_scoring["job_hopper_penalty"]
+                exp_modifier *= 0.85
             
+            if 5.0 <= years_exp <= 9.0:
+                target_exp_score = 1.0
+            elif years_exp < 5.0:
+                target_exp_score = 0.7 + (years_exp / 5.0) * 0.3  
+            else:
+                target_exp_score = max(0.7, 1.0 - (years_exp - 9.0) * 0.05)  
+
             candidate_scores[cid] = {
                 "behavioral_score": round(behavioral_score, 4),
                 "experience_modifier": round(exp_modifier, 4),
+                "target_exp_score": round(target_exp_score, 4),
                 "total_years_exp": years_exp
             }
 

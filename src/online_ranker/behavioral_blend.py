@@ -52,10 +52,11 @@ def run_behavioral_blend(scored_candidates: dict, top_n: int = 100) -> list:
         norm_heuristic = (dynamic_data["heuristic_score"] - min_heu) / range_heu
         
         static_data = static_scores_map.get(cid, {})
-        behavioral_score = static_data.get("behavioral_score", 0.0)
-        
+        behavioral_score = static_data.get("behavioral_score", 0.6) # Baseline default
         exp_modifier = static_data.get("experience_modifier", 1.0)
-        norm_exp = min(static_data.get("total_years_exp", 0.0) / 15.0, 1.0) * exp_modifier
+        
+        base_exp_score = static_data.get("target_exp_score", 0.7)
+        norm_exp = base_exp_score * exp_modifier
 
         final_score = (
             (norm_semantic * w_semantic) +
@@ -64,37 +65,21 @@ def run_behavioral_blend(scored_candidates: dict, top_n: int = 100) -> list:
             (norm_exp * w_exp)
         )
         
+        boosted_score = 0.50 + (final_score * 0.50)
+        
         final_results.append({
             "candidate_id": cid,
-            "score": final_score,
+            "score": boosted_score,
             "years_exp": static_data.get("total_years_exp", 0.0),
-            "entities_found": dynamic_data["entities_found"],
-            "components": {
-                "Semantic Vector Fit": norm_semantic,
-                "Tooling Coverage": norm_heuristic,
-                "Platform Engagement": behavioral_score,
-                "Industry Seniority": norm_exp
-            }
+            "entities_found": dynamic_data["entities_found"]
         })
-
+    
     print("   - Sorting candidates and enforcing deterministic tie-breaks...")
-    # Sort by score descending. If scores tie, sort by candidate_id ascending
     final_results.sort(key=lambda x: (-x["score"], x["candidate_id"]))
 
     top_n_results = final_results[:top_n]
     for rank_idx, candidate in enumerate(top_n_results):
-        candidate["rank"] = rank_idx + 1  # 1-indexed ranks
+        candidate["rank"] = rank_idx + 1 
 
     print(f"[Stage 3] Behavioral blend complete. Extracted final Top {len(top_n_results)}.")
     return top_n_results
-
-if __name__ == "__main__":
-    # Local mock execution
-    dummy_scored = {
-        "CAND_0000031": {"heuristic_score": 10.0, "semantic_score": 0.85, "entities_found": ["pinecone"]},
-        "CAND_0000001": {"heuristic_score": 2.0, "semantic_score": 0.40, "entities_found": []}
-    }
-    # Note: Requires candidate_static_scores.json to exist with these IDs to work locally
-    results = run_behavioral_blend(dummy_scored, top_n=2)
-    for r in results:
-        print(f"Rank {r['rank']}: {r['candidate_id']} | Score: {r['score']:.4f}")
