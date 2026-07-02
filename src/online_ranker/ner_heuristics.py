@@ -82,7 +82,7 @@ def run_ner_heuristics(valid_candidate_ids: set, top_k: int = 1500) -> dict:
     # 5. Sort and truncate to the top 1,500
     print("   - Sorting and shortlisting top candidates...")
     # Sort descending by score
-    candidate_scores.sort(key=lambda x: x[0], reverse=True)
+    candidate_scores.sort(key=lambda x: (-x[0], x[1]))
     
     top_candidates = {}
     for score, cid in candidate_scores[:top_k]:

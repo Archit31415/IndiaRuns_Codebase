@@ -28,7 +28,7 @@ def run_vector_scoring(top_candidates: dict) -> dict:
     jd_path = data_dir / "raw" / "job_description.md"
     precomputed_dir = data_dir / "precomputed"
     model_path = precomputed_dir / "local_models" / "all-MiniLM-L6-v2"
-    embeddings_path = precomputed_dir / "project_embeddings.npy"
+    embeddings_path = precomputed_dir / "history_embeddings.npy"
     ids_path = precomputed_dir / "candidate_ids.txt"
 
     id_to_index = {}

@@ -53,12 +53,10 @@ def run_behavioral_blend(scored_candidates: dict, top_n: int = 100) -> list:
         
         static_data = static_scores_map.get(cid, {})
         behavioral_score = static_data.get("behavioral_score", 0.0)
-        exp_modifier = static_data.get("experience_modifier", 1.0)
         
-        # Normalize experience years (assuming 15 years is the max reasonable bound for scaling)
+        exp_modifier = static_data.get("experience_modifier", 1.0)
         norm_exp = min(static_data.get("total_years_exp", 0.0) / 15.0, 1.0) * exp_modifier
 
-        # The Core Ranking Formula
         final_score = (
             (norm_semantic * w_semantic) +
             (norm_heuristic * w_heuristic) +
@@ -69,10 +67,14 @@ def run_behavioral_blend(scored_candidates: dict, top_n: int = 100) -> list:
         final_results.append({
             "candidate_id": cid,
             "score": final_score,
-            "semantic_score_raw": dynamic_data["semantic_score"],
+            "years_exp": static_data.get("total_years_exp", 0.0),
             "entities_found": dynamic_data["entities_found"],
-            "behavioral_score": behavioral_score,
-            "years_exp": static_data.get("total_years_exp", 0.0)
+            "components": {
+                "Semantic Vector Fit": norm_semantic,
+                "Tooling Coverage": norm_heuristic,
+                "Platform Engagement": behavioral_score,
+                "Industry Seniority": norm_exp
+            }
         })
 
     print("   - Sorting candidates and enforcing deterministic tie-breaks...")
