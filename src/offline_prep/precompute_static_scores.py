@@ -9,7 +9,7 @@ def precompute_static_scores():
     The online script will only need to add the cosine similarity score to this baseline.
     """
     base_dir = Path(__file__).resolve().parent.parent.parent
-    raw_data_path = base_dir / "data" / "raw" / "candidates.jsonl.gz"
+    raw_data_path = base_dir / "data" / "raw" / "candidates.jsonl"
     precomputed_dir = base_dir / "data" / "precomputed"
     rubric_path = precomputed_dir / "recruiter_rubric.json"
     output_file = precomputed_dir / "candidate_static_scores.json"
@@ -23,7 +23,7 @@ def precompute_static_scores():
     candidate_scores = {}
 
     print("Processing static features from raw candidate data...")
-    with gzip.open(raw_data_path, "rt", encoding="utf-8") as f:
+    with open(raw_data_path, "rt", encoding="utf-8") as f:
         for line in f:
             if not line.strip(): continue
             cand = json.loads(line)
