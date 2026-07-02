@@ -1,6 +1,6 @@
 # Redrob AI Candidate Ranker — Production Engine
 
-A highly optimized, decoupled processing pipeline engineered to screen, score, and rank a massive pool of 100,000 candidates against a multi-layered recruiter rubric in under **15 seconds** using zero network calls and a strict 5-minute cold-start time envelope.
+A highly optimized, decoupled processing pipeline engineered to screen, score, and rank a massive pool of 100,000 candidates against a multi-layered recruiter rubric in under **25 seconds** using zero network calls and a strict 5-minute cold-start time envelope.
 
 The architecture strictly separates **heavy offline structural/semantic pre-computation** from **sub-second online inference matrix lookups**, enabling native, production-grade evaluations inside constrained host sandboxes without hitting memory exhaustion bottlenecks.
 
@@ -76,7 +76,7 @@ Follow these exact setup commands to initialize the local workspace environment 
 Clone the repository and install the strict package layers:
 
 ```bash
-git clone https://github.com/Archit31415/IndiaRuns_Codebase
+git clone [https://github.com/Archit31415/IndiaRuns_Codebase](https://github.com/Archit31415/IndiaRuns_Codebase)
 cd IndiaRuns_Codebase
 pip install -r requirements.txt
 
@@ -116,17 +116,20 @@ The final fully compliant CSV array will be compiled directly to `data/output/Co
 
 ## Interactive Live Hosted Sandbox
 
-An interactive web visualization of this exact execution engine is hosted on Streamlit Cloud.
-
-* **Hosted Instance Mechanics:** To maintain a rapid, zero-friction startup loop online, the pre-calculated 150MB `.npy` semantic vector array is deployed securely alongside the code using **Git Large File Storage (Git LFS)**.
-* When you access the interface, it executes your true, unsimulated production scripts (`run_purge`, `run_vector_scoring`, etc.) over pre-loaded real candidate segments, generating the final verified matrix tables dynamically on-screen.
-
 To run the sandbox interface locally instead, execute:
 
 ```bash
 streamlit run app.py
 
 ```
+
+### Technical Note & Sourcing Request
+
+Because GitHub strictly limits large file uploads, hosting our full 100,000-candidate dataset and the 150MB vector matrix inside a free-tier web sandbox is impractical. The web interface is a functional logic demo designed to show correctness, not maximum scale.
+
+**We kindly request that you clone this repository, add `sample_candidates.jsonl` in the `data/raw` folder and run the engine locally. Thank you**
+
+Running the codebase locally allows you to experience the true speed of our disk-optimized matrix architecture (sub-25-second completion), verify our offline data compilation, and fully audit the generated CSV outputs under native performance conditions.
 
 ---
 
