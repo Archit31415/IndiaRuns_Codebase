@@ -36,7 +36,7 @@ sandbox_link: "https://archit31415-indiaruns-codebase-app-aeucwf.streamlit.app/"
 # candidate sample. See Section 10.5 of submission_spec.md for acceptable
 # platforms (HuggingFace Spaces, Streamlit Cloud, Replit, Colab, Docker, Binder).
 
-reproduce_command: "./run_ranker.sh"
+reproduce_command: "python src/online_ranker/main.py"
 # The single command that produces submission.csv from candidates.jsonl.
 # Should run end-to-end within 5 minutes on CPU with 16GB RAM and no network.
 
